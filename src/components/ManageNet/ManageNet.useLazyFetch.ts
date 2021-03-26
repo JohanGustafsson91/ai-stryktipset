@@ -1,48 +1,8 @@
-import React, { Reducer } from "react";
-import { useState, useRef, useEffect, useReducer } from "react";
-
-interface State<T> {
-  data: T;
-  loading: boolean;
-  error: boolean;
-}
-
-type Action<T> =
-  | { type: "pending" }
-  | { type: "resolved"; payload: T }
-  | { type: "rejected" };
-
-function reducer<T>(state: State<T>, action: Action<T>) {
-  switch (action.type) {
-    case "pending": {
-      return {
-        ...state,
-        loading: true,
-        error: false,
-      };
-    }
-    case "resolved": {
-      return { ...state, data: action.payload, loading: false, error: false };
-    }
-    case "rejected": {
-      return { ...state, loading: false, error: true };
-    }
-    default:
-      throw new Error();
-  }
-}
-
-const initialState = {
-  data: null,
-  loading: true,
-  error: true,
-};
+import { useRef, useEffect } from "react";
+import { State, useAsyncProgress } from "./ManageNet.useAsyncProgress";
 
 export function useLazyRequest<T>(): LazyRequestReturnTypes<T> {
-  const [state, dispatch] = useReducer<Reducer<State<T | null>, Action<T>>>(
-    reducer,
-    initialState
-  );
+  const [state, dispatch] = useAsyncProgress<T>();
   const cancelRequest = useRef<AbortController>();
 
   useEffect(() => {
@@ -72,7 +32,7 @@ export function useLazyRequest<T>(): LazyRequestReturnTypes<T> {
 
         const data = await response.json();
 
-        dispatch({ type: "resolved", payload: data });
+        dispatch({ type: "fulfilled", payload: data });
       } catch (error) {
         if (error instanceof DOMException) return; // Request aborted
         dispatch({ type: "rejected" });
@@ -113,14 +73,7 @@ const validateResponse = (response: Response): Response => {
 const delay = (timeInMs = 0) =>
   new Promise((resolve) => setTimeout(resolve, timeInMs));
 
-type LazyRequestReturnTypes<T> = [
-  LazyRequestFn,
-  {
-    data: T | null;
-    loading: boolean;
-    error: boolean;
-  }
-];
+type LazyRequestReturnTypes<T> = [LazyRequestFn, State<T | null>];
 
 type LazyRequestFn = (
   url: RequestInfo,
