@@ -4,7 +4,7 @@ import shortid from "shortid";
 
 export const handlers = [
   rest.get("/played-games", (req, res, ctx) => {
-    return res(ctx.delay(200), ctx.status(400), ctx.json(createStryktips()));
+    return res(ctx.delay(200), ctx.status(200), ctx.json(createStryktips()));
   }),
 ];
 

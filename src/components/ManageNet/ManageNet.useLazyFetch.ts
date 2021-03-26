@@ -1,9 +1,48 @@
-import { useState, useRef, useEffect } from "react";
+import React, { Reducer } from "react";
+import { useState, useRef, useEffect, useReducer } from "react";
+
+interface State<T> {
+  data: T;
+  loading: boolean;
+  error: boolean;
+}
+
+type Action<T> =
+  | { type: "pending" }
+  | { type: "resolved"; payload: T }
+  | { type: "rejected" };
+
+function reducer<T>(state: State<T>, action: Action<T>) {
+  switch (action.type) {
+    case "pending": {
+      return {
+        ...state,
+        loading: true,
+        error: false,
+      };
+    }
+    case "resolved": {
+      return { ...state, data: action.payload, loading: false, error: false };
+    }
+    case "rejected": {
+      return { ...state, loading: false, error: true };
+    }
+    default:
+      throw new Error();
+  }
+}
+
+const initialState = {
+  data: null,
+  loading: true,
+  error: true,
+};
 
 export function useLazyRequest<T>(): LazyRequestReturnTypes<T> {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [state, dispatch] = useReducer<Reducer<State<T | null>, Action<T>>>(
+    reducer,
+    initialState
+  );
   const cancelRequest = useRef<AbortController>();
 
   useEffect(() => {
@@ -17,9 +56,7 @@ export function useLazyRequest<T>(): LazyRequestReturnTypes<T> {
       init?: RequestInit,
       retryOptions?: RequestRetryOptions
     ) => {
-      setLoading(true);
-      setError(false);
-      setData(null);
+      dispatch({ type: "pending" });
 
       try {
         const response = validateResponse(
@@ -35,24 +72,17 @@ export function useLazyRequest<T>(): LazyRequestReturnTypes<T> {
 
         const data = await response.json();
 
-        setData(data);
-        setLoading(false);
+        dispatch({ type: "resolved", payload: data });
       } catch (error) {
         if (error instanceof DOMException) return; // Request aborted
-        setError(true);
-        setLoading(false);
+        dispatch({ type: "rejected" });
       }
     }
   );
 
-  return [
-    fetchRef.current,
-    {
-      data,
-      loading,
-      error,
-    },
-  ];
+  console.log("STATE", state);
+
+  return [fetchRef.current, state];
 }
 
 const request = async (
