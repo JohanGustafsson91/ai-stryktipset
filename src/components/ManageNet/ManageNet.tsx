@@ -23,8 +23,6 @@ export const ManageNet = () => {
   const onRemoveTrainingData = (data: Game) =>
     setTrainingData(trainingData.filter(({ id }) => id !== data.id));
 
-  console.log("render");
-
   return (
     <Content>
       <Column>

@@ -3,29 +3,19 @@ import { rest } from "msw";
 import shortid from "shortid";
 
 export const handlers = [
-  rest.get("/played-games", (req, res, ctx) => {
-    return res(ctx.delay(200), ctx.status(200), ctx.json(createStryktips()));
-  }),
+  rest.get("/played-games", (req, res, ctx) =>
+    res(ctx.delay(200), ctx.status(200), ctx.json(createStryktips()))
+  ),
 ];
 
 const createStryktips = (): { items: Stryktips[] } => ({
-  items: [
-    {
+  items: Array(3)
+    .fill(null)
+    .map((_, i) => ({
       id: shortid(),
-      name: "Stryktipset v 34",
+      name: `Stryktipset v3${i + 1}`,
       games: createGames(),
-    },
-    {
-      id: shortid(),
-      name: "Stryktipset v 35",
-      games: createGames(),
-    },
-    {
-      id: shortid(),
-      name: "Stryktipset v 36",
-      games: createGames(),
-    },
-  ],
+    })),
 });
 
 const createGames = (numOfItems = 13): Game[] =>

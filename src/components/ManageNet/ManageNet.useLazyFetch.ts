@@ -34,13 +34,11 @@ export function useLazyRequest<T>(): LazyRequestReturnTypes<T> {
 
         dispatch({ type: "fulfilled", payload: data });
       } catch (error) {
-        if (error instanceof DOMException) return; // Request aborted
+        if (cancelRequest.current?.signal.aborted) return;
         dispatch({ type: "rejected" });
       }
     }
   );
-
-  console.log("STATE", state);
 
   return [fetchRef.current, state];
 }
