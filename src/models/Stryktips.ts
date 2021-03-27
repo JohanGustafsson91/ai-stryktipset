@@ -8,7 +8,7 @@ export interface Game {
   id: string;
   homeTeam: string;
   awayTeam: string;
-  result: "1" | "X" | "2";
+  result: Result;
   odds: Odds;
 }
 
@@ -17,3 +17,5 @@ export type Odds = {
   X: string;
   2: string;
 };
+
+export type Result = "1" | "X" | "2";
