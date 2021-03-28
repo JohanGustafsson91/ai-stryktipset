@@ -1,3 +1,4 @@
+import { PercentBar } from "components/PercentBar";
 import { Game } from "models/Stryktips";
 import styled from "styled-components";
 
@@ -12,18 +13,35 @@ export const PlayedMatch = ({
 
   return (
     <Wrapper>
-      <input checked={checked} type="checkbox" onChange={onChecked} />
-      <span>
+      <Checkbox checked={checked} onChange={onChecked} />
+      <Flex>
         {stats.homeTeam} vs {stats.awayTeam}
-      </span>
-      <span>-Medeloddsbar-</span>
-      <span>{stats.result}</span>
+      </Flex>
+      <Flex>
+        <PercentBar odds={stats.odds} />
+      </Flex>
+      <Result>{stats.result}</Result>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  margin-bottom: 6px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+`;
+
+const Checkbox = styled.input`
+  margin-right: 12px;
+`;
+Checkbox.defaultProps = { type: "checkbox" };
+
+const Flex = styled.div`
+  flex: 1;
+`;
+
+const Result = styled.div`
+  padding: 6px;
 `;
 
 interface Props {

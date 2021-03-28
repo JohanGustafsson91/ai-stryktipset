@@ -1,24 +1,28 @@
 import styled from "styled-components";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { ManageNet } from "components/ManageNet";
+import { GlobalStyle } from "components/GlobalStyle";
 
 const App = () => (
-  <Router>
-    <Menu>
-      <Logo>AI Stryktipset!</Logo>
-      <Link to="/">Home</Link>
-      <Link to="/dummy">Dummy</Link>
-    </Menu>
+  <>
+    <GlobalStyle />
+    <Router>
+      <Menu>
+        <Logo>AI Stryktipset!</Logo>
+        <Link to="/">Home</Link>
+        <Link to="/dummy">Dummy</Link>
+      </Menu>
 
-    <Switch>
-      <Route path="/dummy">
-        <Dummy />
-      </Route>
-      <Route path="/">
-        <ManageNet />
-      </Route>
-    </Switch>
-  </Router>
+      <Switch>
+        <Route path="/dummy">
+          <Dummy />
+        </Route>
+        <Route path="/">
+          <ManageNet />
+        </Route>
+      </Switch>
+    </Router>
+  </>
 );
 
 const Dummy = () => <div>Dummy</div>;
