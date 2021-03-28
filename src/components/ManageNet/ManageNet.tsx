@@ -27,8 +27,8 @@ export const ManageNet = () => {
     <Content>
       <Column>
         <h3>Välj matcher</h3>
-        {playedGames?.items.map(({ id, name, games }) => (
-          <Accordion key={id} name={name}>
+        {playedGames?.items.map(({ id, name, games }, i) => (
+          <Accordion key={id} name={name} initOpen={i === 0}>
             {games.map((props) => (
               <PlayedMatch
                 key={props.id}
@@ -69,5 +69,3 @@ const Column = styled.div`
   flex: 1;
   padding-right: 24px; /* TODO */
 `;
-
-// TODO colors as --var
