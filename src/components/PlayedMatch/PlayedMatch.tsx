@@ -9,7 +9,7 @@ export const PlayedMatch = ({
   callbackRemove,
 }: Props) => {
   const onChecked = () =>
-    !checked ? callbackAdd(stats) : callbackRemove(stats);
+    !checked ? callbackAdd([stats]) : callbackRemove([stats]);
 
   return (
     <Wrapper>
@@ -46,7 +46,7 @@ const Result = styled.div`
 
 interface Props {
   stats: Game;
-  callbackAdd: (arg0: Game) => void;
-  callbackRemove: (arg0: Game) => void;
+  callbackAdd: (arg0: Game[]) => void;
+  callbackRemove: (arg0: Game[]) => void;
   checked: boolean;
 }
