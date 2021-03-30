@@ -31,7 +31,6 @@ export function useLazyRequest<T>(): LazyRequestReturnTypes<T> {
         );
 
         const data = await response.json();
-        console.log(data);
 
         dispatch({ type: "fulfilled", payload: data });
       } catch (error) {

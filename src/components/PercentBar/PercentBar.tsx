@@ -1,10 +1,11 @@
 import { Box } from "components/Box";
 import { Odds } from "models/Stryktips";
 import styled from "styled-components";
+import { oddsToPercent } from "utils";
 
 export const PercentBar = ({ odds }: Props) => {
   const oddsInPercent = objectValues<string>(odds, resultLabels).map(
-    oddsToPercent
+    (val) => oddsToPercent(val) * 100
   );
   const oddsMarginal = (summarize(oddsInPercent) - 100) / 3;
   const normalizedOdds = oddsInPercent.map((t) => t - oddsMarginal);
@@ -57,8 +58,6 @@ const objectValues = <T extends unknown>(
   keys: string[]
 ): Array<T> =>
   keys.reduce((acc, curr) => [...acc, object[curr]], [] as Array<T>);
-
-const oddsToPercent = (odds: string) => (1 / parseFloat(odds)) * 100;
 
 const summarize = (values: Array<number>) =>
   values.reduce((acc, curr) => acc + curr, 0);

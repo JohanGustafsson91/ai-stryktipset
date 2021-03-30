@@ -1,22 +1,18 @@
 import { Accordion } from "components/Accordion";
-import { NetForm } from "components/NetForm";
-import { PlayedMatch } from "components/PlayedMatch";
+import { NetForm } from "./ManageNet.NetForm";
+import { PlayedMatch } from "./ManageNet.PlayedMatch";
 import { Game, Odds, Stryktips } from "models/Stryktips";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { useLazyRequest } from "./ManageNet.useLazyFetch";
 import { BoxFlex, Box } from "components/Box";
 import { FetchContent } from "components/FetchContent";
 import { CodeBlock } from "./ManageNet.CodeBlock";
+import { oddsToPercent } from "utils";
 
 export const ManageNet = () => {
   const [selectedGames, setSelectedGames] = useState<Game[]>([]);
   const [trainNet, { data: dataTrainNet }] = useLazyRequest<{ id: string }>();
-
-  useEffect(() => {
-    if (!dataTrainNet) return;
-    console.log("Listen for changes on socket", dataTrainNet);
-  }, [dataTrainNet]);
 
   const onAddTrainingData = (data: Game[]) =>
     setSelectedGames([...selectedGames, ...data]);
@@ -86,13 +82,12 @@ export const ManageNet = () => {
   );
 };
 
-// TODO make more generic
 const gamesToTrainingData = (trainingData: Game[]) =>
   trainingData.map((game) => ({
     input: Object.keys(game.odds).reduce(
       (acc, curr) => ({
         ...acc,
-        [curr]: (1 / parseFloat(game.odds[curr as keyof Odds])).toFixed(2),
+        [curr]: oddsToPercent(game.odds[curr as keyof Odds]).toFixed(2),
       }),
       {}
     ),
