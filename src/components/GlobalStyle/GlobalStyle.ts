@@ -14,8 +14,10 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   :root {
-    --color-bg-home-win: #FFF;
+    --color-bg-home-win: #eee;
     --color-bg-draw: #000;
     --color-bg-away-win: #7d7d80;
+    --color-accordion-header: #eee;
+    --color-code-block: #eee;
   }
 `;

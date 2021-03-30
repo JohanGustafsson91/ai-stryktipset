@@ -1,0 +1,1 @@
+export { FetchContent } from "./FetchContent";

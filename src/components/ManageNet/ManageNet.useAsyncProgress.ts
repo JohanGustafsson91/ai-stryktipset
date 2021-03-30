@@ -1,5 +1,7 @@
 import { Dispatch, Reducer, useReducer } from "react";
 
+// TODO make hook useAsyncTask with input async task (eg fetch)
+
 export function useAsyncProgress<T>(): [State<T | null>, Dispatch<Action<T>>] {
   const [state, dispatch] = useReducer<Reducer<State<T | null>, Action<T>>>(
     reducer,
