@@ -6,20 +6,11 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLazyRequest } from "./ManageNet.useLazyFetch";
 import { BoxFlex } from "components/Box";
+import { FetchContent } from "components/FetchContent";
 
 export const ManageNet = () => {
   const [selectedGames, setSelectedGames] = useState<Game[]>([]);
-
-  const [
-    fetchPlayedGames,
-    { data: playedGames, loading, error },
-  ] = useLazyRequest<StryktipsResponse>();
-
   const [trainNet, { data: dataTrainNet }] = useLazyRequest<{ id: string }>();
-
-  useEffect(() => {
-    fetchPlayedGames("/played-games", undefined, { numOfRetries: 3 });
-  }, [fetchPlayedGames]);
 
   useEffect(() => {
     if (!dataTrainNet) return;
@@ -52,29 +43,37 @@ export const ManageNet = () => {
       <Row>
         <Column>
           <h3>Select games</h3>
-          {playedGames?.items.map(({ id, name, games }, i) => (
-            <Accordion key={id} name={name} initOpen={i === 0}>
-              <>
-                <button onClick={() => onAddTrainingData(games)}>
-                  Välj alla
-                </button>
-                <button onClick={() => onRemoveTrainingData(games)}>
-                  Ta bort alla
-                </button>
-                {games.map((props) => (
-                  <PlayedMatch
-                    key={props.id}
-                    stats={props}
-                    callbackAdd={onAddTrainingData}
-                    callbackRemove={onRemoveTrainingData}
-                    checked={!!selectedGames.find(({ id }) => id === props.id)}
-                  />
-                ))}
-              </>
-            </Accordion>
-          ))}
-          {loading && <p>Loading...</p>}
-          {error && <p>Something went wrong when fetching games</p>}
+          <FetchContent<StryktipsResponse>
+            url="/played-games"
+            render={({ data, loading, error }) => {
+              if (loading) return <p>Loading</p>;
+              if (error) return <p>Something went wrong</p>;
+
+              return data?.items.map(({ id, name, games }, i) => (
+                <Accordion key={id} name={name} initOpen={i === 0}>
+                  <>
+                    <button onClick={() => onAddTrainingData(games)}>
+                      Välj alla
+                    </button>
+                    <button onClick={() => onRemoveTrainingData(games)}>
+                      Ta bort alla
+                    </button>
+                    {games.map((props) => (
+                      <PlayedMatch
+                        key={props.id}
+                        stats={props}
+                        callbackAdd={onAddTrainingData}
+                        callbackRemove={onRemoveTrainingData}
+                        checked={
+                          !!selectedGames.find(({ id }) => id === props.id)
+                        }
+                      />
+                    ))}
+                  </>
+                </Accordion>
+              ));
+            }}
+          />
         </Column>
 
         <Column>
