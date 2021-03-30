@@ -1,6 +1,6 @@
 import { Box, BoxFlex } from "components/Box";
 import { PercentBar } from "components/PercentBar";
-import { Game } from "models/Stryktips";
+import { PlayedGame } from "models/Stryktips";
 import styled from "styled-components";
 import { SpaceProps, space } from "styled-system";
 
@@ -35,8 +35,8 @@ const Checkbox = styled.input<SpaceProps>`
 Checkbox.defaultProps = { type: "checkbox", mr: 3 };
 
 interface Props {
-  stats: Game;
-  callbackAdd: (arg0: Game[]) => void;
-  callbackRemove: (arg0: Game[]) => void;
+  stats: PlayedGame;
+  callbackAdd: (arg0: PlayedGame[]) => void;
+  callbackRemove: (arg0: PlayedGame[]) => void;
   checked: boolean;
 }

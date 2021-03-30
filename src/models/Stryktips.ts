@@ -1,14 +1,14 @@
 export interface Stryktips {
   id: string;
   name: string;
-  games: Game[];
+  games: PlayedGame[];
 }
 
-export interface Game {
+export interface PlayedGame {
   id: string;
   homeTeam: string;
   awayTeam: string;
-  result: Result;
+  result: Result | null;
   odds: Odds;
 }
 
@@ -18,4 +18,8 @@ export type Odds = {
   2: string;
 };
 
-export type Result = "1" | "X" | "2";
+export interface Result {
+  one?: boolean;
+  x?: boolean;
+  two?: boolean;
+}
