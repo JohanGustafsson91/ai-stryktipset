@@ -3,7 +3,10 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import React from "react";
 
-if (process.env.NODE_ENV === "development") {
+if (
+  process.env.NODE_ENV === "development" &&
+  process.env.REACT_APP_OFFLINE === "true"
+) {
   const { worker } = require("./mocks/browser");
   worker.start();
 }

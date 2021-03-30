@@ -1,7 +1,7 @@
 import { Accordion } from "components/Accordion";
 import { NetForm } from "./ManageNet.NetForm";
 import { PlayedMatch } from "./ManageNet.PlayedMatch";
-import { Game, Odds, Stryktips } from "models/Stryktips";
+import { PlayedGame, Odds, Stryktips } from "models/Stryktips";
 import { useState } from "react";
 import styled from "styled-components";
 import { useLazyRequest } from "./ManageNet.useLazyFetch";
@@ -11,13 +11,13 @@ import { CodeBlock } from "./ManageNet.CodeBlock";
 import { oddsToPercent } from "utils";
 
 export const ManageNet = () => {
-  const [selectedGames, setSelectedGames] = useState<Game[]>([]);
+  const [selectedGames, setSelectedGames] = useState<PlayedGame[]>([]);
   const [trainNet, { data: dataTrainNet }] = useLazyRequest<{ id: string }>();
 
-  const onAddTrainingData = (data: Game[]) =>
+  const onAddTrainingData = (data: PlayedGame[]) =>
     setSelectedGames([...selectedGames, ...data]);
 
-  const onRemoveTrainingData = (data: Game[]) =>
+  const onRemoveTrainingData = (data: PlayedGame[]) =>
     setSelectedGames(
       selectedGames.filter(({ id }) => !data.find((d) => d.id === id))
     );
@@ -27,7 +27,13 @@ export const ManageNet = () => {
       <Row>
         <Column>
           <h3>Net options</h3>
-          <NetForm onSubmit={(form) => trainNet(`/net`, { method: "post" })} />
+          <NetForm
+            onSubmit={(form) =>
+              trainNet(`${process.env.REACT_APP_BACKEND_URL}/net/train`, {
+                method: "post",
+              })
+            }
+          />
         </Column>
         <Column>
           <h3>Status</h3>
@@ -38,7 +44,9 @@ export const ManageNet = () => {
       <Row>
         <Column>
           <h3>Select games</h3>
-          <FetchContent<StryktipsResponse> url="/played-games">
+          <FetchContent<StryktipsResponse>
+            url={`${process.env.REACT_APP_BACKEND_URL}/stryktipset`}
+          >
             {({ data, loading, error }) => {
               if (loading) return <p>Loading</p>;
               if (error) return <p>Something went wrong</p>;
@@ -82,7 +90,7 @@ export const ManageNet = () => {
   );
 };
 
-const gamesToTrainingData = (trainingData: Game[]) =>
+const gamesToTrainingData = (trainingData: PlayedGame[]) =>
   trainingData.map((game) => ({
     input: Object.keys(game.odds).reduce(
       (acc, curr) => ({
