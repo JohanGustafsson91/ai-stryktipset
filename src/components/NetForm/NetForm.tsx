@@ -1,5 +1,14 @@
+import { BoxFlex } from "components/Box";
 import { ChangeEvent, useState } from "react";
 import styled from "styled-components";
+import {
+  color,
+  ColorProps,
+  space,
+  SpaceProps,
+  typography,
+  TypographyProps,
+} from "styled-system";
 
 export const NetForm = ({ onSubmit }: Props) => {
   const [form, setForm] = useState<Form>({
@@ -16,10 +25,10 @@ export const NetForm = ({ onSubmit }: Props) => {
   return (
     <div>
       <FormField>
-        <LabelContainer>
+        <BoxFlex>
           <Label htmlFor="iterations">Iterationer</Label>
           <span>{form.iterations}</span>
-        </LabelContainer>
+        </BoxFlex>
         <input
           type="range"
           name="iterations"
@@ -32,10 +41,10 @@ export const NetForm = ({ onSubmit }: Props) => {
       </FormField>
 
       <FormField>
-        <LabelContainer>
+        <BoxFlex>
           <Label htmlFor="errorThresh">Error threshold</Label>
           <span>{form.errorThresh}</span>
-        </LabelContainer>
+        </BoxFlex>
         <input
           type="range"
           name="errorThresh"
@@ -61,20 +70,20 @@ interface Form {
   errorThresh: number;
 }
 
-const FormField = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 24px;
-`;
+const FormField = styled(BoxFlex)``;
+FormField.defaultProps = {
+  flexDirection: "column",
+  mb: 4,
+};
 
-const LabelContainer = styled.label`
-  display: flex;
+const Label = styled.label<TypographyProps & SpaceProps & ColorProps>`
+  ${space}
+  ${typography}
+  ${color}
   flex: 1;
 `;
-
-const Label = styled.label`
-  font-weight: bold;
-  margin-bottom: 6px;
-  flex: 1;
-  color: grey;
-`;
+Label.defaultProps = {
+  fontWeight: "bold",
+  mb: 2,
+  color: "var(--color-bg-away-win)",
+};

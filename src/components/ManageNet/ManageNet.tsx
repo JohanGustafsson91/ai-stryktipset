@@ -5,6 +5,7 @@ import { Game, Odds, Stryktips } from "models/Stryktips";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLazyRequest } from "./ManageNet.useLazyFetch";
+import { BoxFlex } from "components/Box";
 
 export const ManageNet = () => {
   const [selectedGames, setSelectedGames] = useState<Game[]>([]);
@@ -14,7 +15,7 @@ export const ManageNet = () => {
     { data: playedGames, loading, error },
   ] = useLazyRequest<StryktipsResponse>();
 
-  const [trainNet, { data: dataTrainNet }] = useLazyRequest<unknown>();
+  const [trainNet, { data: dataTrainNet }] = useLazyRequest<{ id: string }>();
 
   useEffect(() => {
     fetchPlayedGames("/played-games", undefined, { numOfRetries: 3 });
@@ -34,7 +35,7 @@ export const ManageNet = () => {
     );
 
   return (
-    <Content>
+    <BoxFlex flexDirection={["column"]}>
       <Row>
         <Column>
           <h3>Net options</h3>
@@ -42,8 +43,12 @@ export const ManageNet = () => {
         </Column>
         <Column>
           <h3>Status</h3>
+          {dataTrainNet && (
+            <span>TODO connect to socket {dataTrainNet?.id}</span>
+          )}
         </Column>
       </Row>
+
       <Row>
         <Column>
           <h3>Select games</h3>
@@ -71,6 +76,7 @@ export const ManageNet = () => {
           {loading && <p>Loading...</p>}
           {error && <p>Something went wrong when fetching games</p>}
         </Column>
+
         <Column>
           <h3>Training data</h3>
           {selectedGames.length > 0 && (
@@ -80,10 +86,11 @@ export const ManageNet = () => {
           )}
         </Column>
       </Row>
-    </Content>
+    </BoxFlex>
   );
 };
 
+// TODO make more generic
 const gamesToTrainingData = (trainingData: Game[]) =>
   trainingData.map((game) => ({
     input: Object.keys(game.odds).reduce(
@@ -100,21 +107,16 @@ interface StryktipsResponse {
   items: Stryktips[];
 }
 
-const Content = styled.div`
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-`;
+const Row = styled(BoxFlex)``;
+Row.defaultProps = {
+  flexDirection: ["column", "column", "row"],
+};
 
-const Row = styled.div`
-  display: flex;
-  flex: 1;
-`;
-
-const Column = styled.div`
-  flex: 1;
-  padding-right: 24px; /* TODO */
-`;
+const Column = styled(BoxFlex)``;
+Column.defaultProps = {
+  flexDirection: ["column"],
+  p: [4],
+};
 
 const Pre = styled.pre`
   background-color: #eee;

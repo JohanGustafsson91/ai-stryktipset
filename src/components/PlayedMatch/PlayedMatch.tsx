@@ -1,6 +1,8 @@
+import { Box, BoxFlex } from "components/Box";
 import { PercentBar } from "components/PercentBar";
 import { Game } from "models/Stryktips";
 import styled from "styled-components";
+import { SpaceProps, space } from "styled-system";
 
 export const PlayedMatch = ({
   stats,
@@ -12,37 +14,25 @@ export const PlayedMatch = ({
     !checked ? callbackAdd([stats]) : callbackRemove([stats]);
 
   return (
-    <Wrapper>
+    <BoxFlex alignItems="center" mb={2} onClick={onChecked}>
       <Checkbox checked={checked} onChange={onChecked} />
-      <Flex>
+      <BoxFlex>
         {stats.homeTeam} vs {stats.awayTeam}
-      </Flex>
-      <Flex>
+      </BoxFlex>
+      <BoxFlex minWidth="270px">
         <PercentBar odds={stats.odds} />
-      </Flex>
-      <Result>{stats.result}</Result>
-    </Wrapper>
+      </BoxFlex>
+      <Box ml={2} p={1}>
+        {stats.result}
+      </Box>
+    </BoxFlex>
   );
 };
 
-const Wrapper = styled.div`
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
+const Checkbox = styled.input<SpaceProps>`
+  ${space}
 `;
-
-const Checkbox = styled.input`
-  margin-right: 12px;
-`;
-Checkbox.defaultProps = { type: "checkbox" };
-
-const Flex = styled.div`
-  flex: 1;
-`;
-
-const Result = styled.div`
-  padding: 6px;
-`;
+Checkbox.defaultProps = { type: "checkbox", mr: 3 };
 
 interface Props {
   stats: Game;
