@@ -5,8 +5,9 @@ import { Game, Odds, Stryktips } from "models/Stryktips";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLazyRequest } from "./ManageNet.useLazyFetch";
-import { BoxFlex } from "components/Box";
+import { BoxFlex, Box } from "components/Box";
 import { FetchContent } from "components/FetchContent";
+import { CodeBlock } from "./ManageNet.CodeBlock";
 
 export const ManageNet = () => {
   const [selectedGames, setSelectedGames] = useState<Game[]>([]);
@@ -34,54 +35,50 @@ export const ManageNet = () => {
         </Column>
         <Column>
           <h3>Status</h3>
-          {dataTrainNet && (
-            <span>TODO connect to socket {dataTrainNet?.id}</span>
-          )}
+          {dataTrainNet && <span>Connect to socket {dataTrainNet?.id}</span>}
         </Column>
       </Row>
 
       <Row>
         <Column>
           <h3>Select games</h3>
-          <FetchContent<StryktipsResponse>
-            url="/played-games"
-            render={({ data, loading, error }) => {
+          <FetchContent<StryktipsResponse> url="/played-games">
+            {({ data, loading, error }) => {
               if (loading) return <p>Loading</p>;
               if (error) return <p>Something went wrong</p>;
 
               return data?.items.map(({ id, name, games }, i) => (
                 <Accordion key={id} name={name} initOpen={i === 0}>
-                  <>
+                  <ButtonContainer mb={3}>
                     <button onClick={() => onAddTrainingData(games)}>
                       Välj alla
                     </button>
                     <button onClick={() => onRemoveTrainingData(games)}>
                       Ta bort alla
                     </button>
-                    {games.map((props) => (
-                      <PlayedMatch
-                        key={props.id}
-                        stats={props}
-                        callbackAdd={onAddTrainingData}
-                        callbackRemove={onRemoveTrainingData}
-                        checked={
-                          !!selectedGames.find(({ id }) => id === props.id)
-                        }
-                      />
-                    ))}
-                  </>
+                  </ButtonContainer>
+
+                  {games.map((props) => (
+                    <PlayedMatch
+                      key={props.id}
+                      stats={props}
+                      callbackAdd={onAddTrainingData}
+                      callbackRemove={onRemoveTrainingData}
+                      checked={
+                        !!selectedGames.find(({ id }) => id === props.id)
+                      }
+                    />
+                  ))}
                 </Accordion>
               ));
             }}
-          />
+          </FetchContent>
         </Column>
 
         <Column>
           <h3>Training data</h3>
           {selectedGames.length > 0 && (
-            <Pre>
-              {JSON.stringify(gamesToTrainingData(selectedGames), null, 1)}
-            </Pre>
+            <CodeBlock data={gamesToTrainingData(selectedGames)} />
           )}
         </Column>
       </Row>
@@ -117,9 +114,8 @@ Column.defaultProps = {
   p: [4],
 };
 
-const Pre = styled.pre`
-  background-color: #eee;
-  min-height: 40vh;
-  max-height: 40vh;
-  overflow: auto;
+const ButtonContainer = styled(Box)`
+  button {
+    margin-right: 12px;
+  }
 `;

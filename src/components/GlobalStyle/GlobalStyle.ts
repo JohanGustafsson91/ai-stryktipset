@@ -18,5 +18,6 @@ export const GlobalStyle = createGlobalStyle`
     --color-bg-draw: #000;
     --color-bg-away-win: #7d7d80;
     --color-accordion-header: #eee;
+    --color-code-block: #eee;
   }
 `;
