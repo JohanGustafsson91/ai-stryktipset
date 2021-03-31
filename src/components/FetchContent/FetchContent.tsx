@@ -5,10 +5,12 @@ export const FetchContent = <T extends unknown>({
   url,
   children,
 }: Props<T>) => {
-  const [task, { data, status, error }] = useAsyncTask<T>({ numOfRetries: 2 });
+  const [task, { data, status, error }] = useAsyncTask(() => request<T>(url), {
+    numOfRetries: 2,
+  });
 
   useEffect(() => {
-    task(() => request<T>(url));
+    task();
   }, [task, url]);
 
   return (

@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { ManageNet } from "components/ManageNet";
 import { GlobalStyle } from "components/GlobalStyle";
+import { DummyLogin } from "components/DummyLogin/DummyLogin";
 
 const App = () => (
   <>
@@ -15,7 +16,7 @@ const App = () => (
 
       <Switch>
         <Route path="/dummy">
-          <Dummy />
+          <DummyLogin />
         </Route>
         <Route path="/">
           <ManageNet />
@@ -24,8 +25,6 @@ const App = () => (
     </Router>
   </>
 );
-
-const Dummy = () => <div>Dummy</div>;
 
 const Menu = styled.div`
   padding: 12px 24px;

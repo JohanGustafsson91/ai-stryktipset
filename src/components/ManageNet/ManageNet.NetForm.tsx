@@ -65,7 +65,7 @@ interface Props {
   onSubmit: (args: Form) => void;
 }
 
-interface Form {
+export interface Form {
   iterations: number;
   errorThresh: number;
 }
