@@ -1,21 +1,32 @@
-import { State } from "components/ManageNet/ManageNet.useAsyncProgress";
-import { useLazyRequest } from "components/ManageNet/ManageNet.useLazyFetch";
+import { useAsyncTask, request } from "shared";
 import { useEffect, ReactElement } from "react";
 
 export const FetchContent = <T extends unknown>({
   url,
   children,
 }: Props<T>) => {
-  const [doFetch, state] = useLazyRequest<T>();
+  const [task, { data, status, error }] = useAsyncTask<T>({ numOfRetries: 2 });
 
   useEffect(() => {
-    doFetch(url);
-  }, [doFetch, url]);
+    task(() => request<T>(url));
+  }, [task, url]);
 
-  return children(state) ?? null;
+  return (
+    children({
+      data,
+      loading: status === "pending",
+      error: error !== null,
+    }) ?? null
+  );
 };
 
 interface Props<T> {
   url: RequestInfo;
-  children: (args1: State<T | null>) => ReactElement | any; // TODO
+  children: RenderProps<T>;
 }
+
+type RenderProps<T> = (arg: {
+  data: T | null;
+  loading: boolean;
+  error: boolean;
+}) => ReactElement | any;
