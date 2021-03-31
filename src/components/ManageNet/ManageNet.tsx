@@ -4,15 +4,15 @@ import { PlayedMatch } from "./ManageNet.PlayedMatch";
 import { PlayedGame, Odds, Stryktips } from "models/Stryktips";
 import { useState } from "react";
 import styled from "styled-components";
-import { useLazyRequest } from "./ManageNet.useLazyFetch";
 import { BoxFlex, Box } from "components/Box";
 import { FetchContent } from "components/FetchContent";
 import { CodeBlock } from "./ManageNet.CodeBlock";
 import { oddsToPercent } from "utils";
+import { useAsyncTask, request } from "shared";
 
 export const ManageNet = () => {
   const [selectedGames, setSelectedGames] = useState<PlayedGame[]>([]);
-  const [trainNet, { data: dataTrainNet }] = useLazyRequest<{ id: string }>();
+  const [trainNet, { data: dataTrainNet }] = useAsyncTask<{ id: string }>();
 
   const onAddTrainingData = (data: PlayedGame[]) =>
     setSelectedGames([...selectedGames, ...data]);
@@ -27,13 +27,7 @@ export const ManageNet = () => {
       <Row>
         <Column>
           <h3>Net options</h3>
-          <NetForm
-            onSubmit={(form) =>
-              trainNet(`${process.env.REACT_APP_BACKEND_URL}/net/train`, {
-                method: "post",
-              })
-            }
-          />
+          <NetForm onSubmit={(form) => trainNet(postTrainNet)} />
         </Column>
         <Column>
           <h3>Status</h3>
@@ -89,6 +83,11 @@ export const ManageNet = () => {
     </BoxFlex>
   );
 };
+
+const postTrainNet = (): Promise<{ id: string }> =>
+  request(`${process.env.REACT_APP_BACKEND_URL}/net/train`, {
+    method: "post",
+  });
 
 const gamesToTrainingData = (trainingData: PlayedGame[]) =>
   trainingData.map((game) => ({
