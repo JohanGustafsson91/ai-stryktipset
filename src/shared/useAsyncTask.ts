@@ -7,7 +7,7 @@ export function useAsyncTask<
   retryOptions: RetryOptions = { numOfRetries: 0, waitMsBeforeRetry: 0 }
 ): [
   Task,
-  { status: Status; data: ReturnTypeAsync<Task> | null; error: Error }
+  { status: Status; data: ReturnTypeAsync<Task> | null; error: Error | null }
 ] {
   const [state, dispatch] = useReducer<TaskReducer<ReturnTypeAsync<Task>>>(
     reducer,
@@ -51,7 +51,7 @@ export function useAsyncTask<
         return doTask(args, retries - 1, delayMs);
       }
 
-      dispatch({ type: "rejected", payload: error });
+      dispatch({ type: "rejected", payload: error as Error });
     }
   }
 
@@ -106,17 +106,15 @@ type Status = "idle" | "pending" | "fulfilled" | "rejected";
 
 type Data<T> = T | null;
 
-type Error = unknown;
-
 type TaskReducer<T> = Reducer<State<Data<T>>, Action<Data<T>>>;
 
 interface State<T> {
   data: T;
   status: Status;
-  error: unknown | null;
+  error: Error | null;
 }
 
 type Action<T> =
   | { type: "pending" }
   | { type: "fulfilled"; payload: T }
-  | { type: "rejected"; payload?: unknown };
+  | { type: "rejected"; payload: Error };

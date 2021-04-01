@@ -27,11 +27,7 @@ export const ManageNet = () => {
       <Row>
         <Column>
           <h3>Net options</h3>
-          <NetForm
-            onSubmit={(form: Form) => {
-              trainNet(form);
-            }}
-          />
+          <NetForm onSubmit={(form: Form) => trainNet(form)} />
         </Column>
         <Column>
           <h3>Status</h3>
@@ -46,17 +42,17 @@ export const ManageNet = () => {
             url={`${process.env.REACT_APP_BACKEND_URL}/stryktipset`}
           >
             {({ data, loading, error }) => {
-              if (loading) return <p>Loading</p>;
-              if (error) return <p>Something went wrong</p>;
+              if (loading) return <p>Loading...</p>;
+              if (error) return <p>Could not fetch stryktips data</p>;
 
               return data?.items.map(({ id, name, games }, i) => (
                 <Accordion key={id} name={name} initOpen={i === 0}>
                   <ButtonContainer mb={3}>
                     <button onClick={() => onAddTrainingData(games)}>
-                      Välj alla
+                      Select all
                     </button>
                     <button onClick={() => onRemoveTrainingData(games)}>
-                      Ta bort alla
+                      Remove all
                     </button>
                   </ButtonContainer>
 
