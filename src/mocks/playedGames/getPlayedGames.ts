@@ -5,7 +5,7 @@ import rawData from "./mock.db";
 export const getPlayedGames = rest.get(
   `${process.env.REACT_APP_BACKEND_URL}/stryktipset`,
   (req, res, ctx) =>
-    res(ctx.delay(200), ctx.status(200), ctx.json(formatStryktipsData(rawData)))
+    res(ctx.status(200), ctx.json(formatStryktipsData(rawData)))
 );
 
 const formatStryktipsData = (data: typeof rawData): { items: Stryktips[] } => ({

@@ -25,7 +25,7 @@ const App = () => (
   </>
 );
 
-const Dummy = () => <div>Dummy</div>;
+const Dummy = () => <>Dummy page</>;
 
 const Menu = styled.div`
   padding: 12px 24px;

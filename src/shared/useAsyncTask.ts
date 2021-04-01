@@ -1,13 +1,27 @@
 import { Reducer, useEffect, useReducer, useRef } from "react";
 
-export function useAsyncTask<D>(
+export function useAsyncTask<
+  Task extends (...args: TaskArgs) => Promise<ReturnTypeAsync<Task>>
+>(
+  task: Task,
   retryOptions: RetryOptions = { numOfRetries: 0, waitMsBeforeRetry: 0 }
-): ReturnTypes<D> {
-  const [state, dispatch] = useReducer<TaskReducer<D>>(reducer, {
-    data: null,
-    status: "idle",
-    error: null,
-  });
+): [
+  Task,
+  { status: Status; data: ReturnTypeAsync<Task> | null; error: Error | null }
+] {
+  const [state, dispatch] = useReducer<TaskReducer<ReturnTypeAsync<Task>>>(
+    reducer,
+    {
+      data: null,
+      status: "idle",
+      error: null,
+    }
+  );
+
+  const taskRef = useRef((...args: TaskArgs) =>
+    doTask(args, retryOptions.numOfRetries, retryOptions.waitMsBeforeRetry)
+  );
+
   const abortController = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -18,30 +32,30 @@ export function useAsyncTask<D>(
     };
   }, []);
 
-  const taskRef = useRef(async (task: Task<D>) => {
-    doTask(retryOptions.numOfRetries, retryOptions.waitMsBeforeRetry);
+  async function doTask(
+    args: TaskArgs,
+    retries = 0,
+    delayMs = 0
+  ): Promise<void> {
+    dispatch({ type: "pending" });
 
-    async function doTask(retries = 0, delayMs = 0): Promise<void> {
-      dispatch({ type: "pending" });
+    try {
+      const res = (await task(args)) as ReturnTypeAsync<Task>;
+      if (abortController.current?.signal.aborted) return;
+      dispatch({ type: "fulfilled", payload: res });
+    } catch (error) {
+      if (abortController.current?.signal.aborted) return;
 
-      try {
-        const res = await task();
-        if (abortController.current?.signal.aborted) return;
-        dispatch({ type: "fulfilled", payload: res });
-      } catch (error) {
-        if (abortController.current?.signal.aborted) return;
-
-        if (retries > 0) {
-          await delay(delayMs);
-          return doTask(retries - 1, delayMs);
-        }
-
-        dispatch({ type: "rejected", payload: error });
+      if (retries > 0) {
+        await delay(delayMs);
+        return doTask(args, retries - 1, delayMs);
       }
-    }
-  });
 
-  return [taskRef.current, state];
+      dispatch({ type: "rejected", payload: error as Error });
+    }
+  }
+
+  return [taskRef.current as Task, state];
 }
 
 function reducer<T>(state: State<T>, action: Action<T>): State<Data<T>> {
@@ -75,33 +89,32 @@ function reducer<T>(state: State<T>, action: Action<T>): State<Data<T>> {
 const delay = (timeInMs = 0) =>
   new Promise((resolve) => setTimeout(resolve, timeInMs));
 
+type TaskArgs = any[];
+
+type ReturnTypeAsync<T extends (...args: any) => any> = T extends (
+  ...args: any
+) => Promise<infer R>
+  ? R
+  : any;
+
 interface RetryOptions {
   numOfRetries: number;
   waitMsBeforeRetry?: number;
 }
 
-type ReturnTypes<T> = [
-  (arg: Task<T>) => void,
-  { status: Status; data: Data<T>; error: Error }
-];
-
-type Task<T> = (...args: unknown[]) => Promise<T | never>;
-
 type Status = "idle" | "pending" | "fulfilled" | "rejected";
 
 type Data<T> = T | null;
-
-type Error = unknown;
 
 type TaskReducer<T> = Reducer<State<Data<T>>, Action<Data<T>>>;
 
 interface State<T> {
   data: T;
   status: Status;
-  error: unknown | null;
+  error: Error | null;
 }
 
 type Action<T> =
   | { type: "pending" }
   | { type: "fulfilled"; payload: T }
-  | { type: "rejected"; payload?: unknown };
+  | { type: "rejected"; payload: Error };

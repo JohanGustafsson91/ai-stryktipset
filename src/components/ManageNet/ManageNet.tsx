@@ -1,5 +1,5 @@
 import { Accordion } from "components/Accordion";
-import { NetForm } from "./ManageNet.NetForm";
+import { Form, NetForm } from "./ManageNet.NetForm";
 import { PlayedMatch } from "./ManageNet.PlayedMatch";
 import { PlayedGame, Odds, Stryktips } from "models/Stryktips";
 import { useState } from "react";
@@ -12,7 +12,7 @@ import { useAsyncTask, request } from "shared";
 
 export const ManageNet = () => {
   const [selectedGames, setSelectedGames] = useState<PlayedGame[]>([]);
-  const [trainNet, { data: dataTrainNet }] = useAsyncTask<{ id: string }>();
+  const [trainNet, { data: dataTrainNet }] = useAsyncTask(postTrainNet);
 
   const onAddTrainingData = (data: PlayedGame[]) =>
     setSelectedGames([...selectedGames, ...data]);
@@ -27,7 +27,7 @@ export const ManageNet = () => {
       <Row>
         <Column>
           <h3>Net options</h3>
-          <NetForm onSubmit={(form) => trainNet(postTrainNet)} />
+          <NetForm onSubmit={(form: Form) => trainNet(form)} />
         </Column>
         <Column>
           <h3>Status</h3>
@@ -42,17 +42,17 @@ export const ManageNet = () => {
             url={`${process.env.REACT_APP_BACKEND_URL}/stryktipset`}
           >
             {({ data, loading, error }) => {
-              if (loading) return <p>Loading</p>;
-              if (error) return <p>Something went wrong</p>;
+              if (loading) return <p>Loading...</p>;
+              if (error) return <p>Could not fetch stryktips data</p>;
 
               return data?.items.map(({ id, name, games }, i) => (
                 <Accordion key={id} name={name} initOpen={i === 0}>
                   <ButtonContainer mb={3}>
                     <button onClick={() => onAddTrainingData(games)}>
-                      Välj alla
+                      Select all
                     </button>
                     <button onClick={() => onRemoveTrainingData(games)}>
-                      Ta bort alla
+                      Remove all
                     </button>
                   </ButtonContainer>
 
@@ -84,7 +84,7 @@ export const ManageNet = () => {
   );
 };
 
-const postTrainNet = (): Promise<{ id: string }> =>
+const postTrainNet = (form: Form): Promise<{ id: string }> =>
   request(`${process.env.REACT_APP_BACKEND_URL}/net/train`, {
     method: "post",
   });
