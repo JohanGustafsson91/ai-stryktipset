@@ -1,5 +1,13 @@
 import { Reducer, useEffect, useReducer, useRef } from "react";
 
+/**
+ * The purpose of this hook is to abstract away reccuring side effects
+ * (DRY) such as loading, error handling and retry on failure.
+ *
+ * @param task An async function
+ * @param retryOptions { numOfRetries: number; waitMsBeforeRetry?: number; }
+ * @returns [task , { data, status, error }]
+ */
 export function useAsyncTask<
   Task extends (...args: TaskArgs) => Promise<ReturnTypeAsync<Task>>
 >(
