@@ -1,4 +1,4 @@
-import { postNet } from "./net/postNet";
-import { getPlayedGames } from "./playedGames/getPlayedGames";
+import { postNet } from "./nets/post";
+import { getStryktips } from "./stryktips/get";
 
-export const handlers = [getPlayedGames, postNet];
+export const handlers = [getStryktips, postNet];
