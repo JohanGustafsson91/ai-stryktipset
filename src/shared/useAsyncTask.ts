@@ -48,7 +48,7 @@ export function useAsyncTask<
     dispatch({ type: "pending" });
 
     try {
-      const res = (await task(args)) as ReturnTypeAsync<Task>;
+      const res = (await task(...args)) as ReturnTypeAsync<Task>;
       if (abortController.current?.signal.aborted) return;
       dispatch({ type: "fulfilled", payload: res });
     } catch (error) {
