@@ -10,9 +10,9 @@ import {
   TypographyProps,
 } from "styled-system";
 
-export const NetForm = ({ onSubmit }: Props) => {
+export const NetForm = ({ onSubmit, disabledSubmitButton }: Props) => {
   const [form, setForm] = useState<Form>({
-    errorThresh: 0.05,
+    errorThresh: 0.005,
     iterations: 20000,
   });
 
@@ -56,13 +56,16 @@ export const NetForm = ({ onSubmit }: Props) => {
         />
       </FormField>
 
-      <button onClick={() => onSubmit(form)}>Train</button>
+      <button disabled={disabledSubmitButton} onClick={() => onSubmit(form)}>
+        Train
+      </button>
     </div>
   );
 };
 
 interface Props {
   onSubmit: (args: Form) => void;
+  disabledSubmitButton: boolean;
 }
 
 export interface Form {

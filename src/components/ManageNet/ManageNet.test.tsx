@@ -5,6 +5,7 @@ import { ManageNet } from ".";
 import { setupServer } from "msw/node";
 import { handlers } from "mocks/handlers";
 import { rest } from "msw";
+import { GET_STRYKTIPS_ENDPOINT, POST_NET_ENDPOINT } from "shared/endpoints";
 
 export const server = setupServer(...handlers);
 
@@ -20,25 +21,14 @@ test("successfully fetches stryktipset data", async () => {
   render(<ManageNet />);
 
   expect(screen.getByText("Loading...")).toBeInTheDocument();
-  expect(
-    await screen.findByText("Stryktipset v 4, stänger 2021-01-30 15:59 brain")
-  ).toBeInTheDocument();
-  expect(
-    screen.getByText("Stryktipset v 7, stänger 2021-02-20 15:59 brainjs")
-  ).toBeInTheDocument();
-  expect(
-    screen.getByText("Stryktipset v 9, stänger 2021-03-06 15:59 brainjs")
-  ).toBeInTheDocument();
-  expect(serverCall.mock.calls.flat()).toEqual([
-    "http://localhost:8080/stryktipset",
-  ]);
+  expect(await screen.findAllByText(/Stryktipset v/)).toHaveLength(3);
+  expect(serverCall.mock.calls.flat()).toEqual([GET_STRYKTIPS_ENDPOINT]);
 });
 
 test("shows error message when fetching stryktipset error", async () => {
   server.use(
-    rest.get(
-      `${process.env.REACT_APP_BACKEND_URL}/stryktipset`,
-      (req, res, ctx) => res(ctx.status(400), ctx.json({}))
+    rest.get(GET_STRYKTIPS_ENDPOINT, (req, res, ctx) =>
+      res(ctx.status(400), ctx.json({}))
     )
   );
   render(<ManageNet />);
@@ -47,16 +37,18 @@ test("shows error message when fetching stryktipset error", async () => {
     await screen.findByText("Could not fetch stryktips data")
   ).toBeInTheDocument();
   expect(serverCall.mock.calls.flat()).toEqual([
-    "http://localhost:8080/stryktipset",
-    "http://localhost:8080/stryktipset",
-    "http://localhost:8080/stryktipset",
+    GET_STRYKTIPS_ENDPOINT,
+    GET_STRYKTIPS_ENDPOINT,
+    GET_STRYKTIPS_ENDPOINT,
   ]);
 });
 
 test("trains net", async () => {
   render(<ManageNet />);
-  const formButton = await screen.findByRole("button", { name: "Train" });
+  const selectGames = await screen.findByRole("button", { name: "Select all" });
+  const formButton = screen.getByRole("button", { name: "Train" });
 
+  userEvent.click(selectGames);
   userEvent.click(formButton);
 
   expect(
@@ -64,7 +56,7 @@ test("trains net", async () => {
   ).toBeInTheDocument();
 
   expect(serverCall.mock.calls.flat()).toEqual([
-    "http://localhost:8080/stryktipset",
-    "http://localhost:8080/net/train",
+    GET_STRYKTIPS_ENDPOINT,
+    POST_NET_ENDPOINT,
   ]);
 });

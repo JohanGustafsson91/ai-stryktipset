@@ -18,8 +18,4 @@ export type Odds = {
   2: string;
 };
 
-export interface Result {
-  one?: boolean;
-  x?: boolean;
-  two?: boolean;
-}
+export type Result = "1" | "X" | "2";

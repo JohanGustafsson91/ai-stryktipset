@@ -1,5 +1,5 @@
 import { Box, BoxFlex } from "components/Box";
-import { PercentBar } from "components/PercentBar";
+import { PercentBar } from "./ManageNet.PercentBar";
 import { PlayedGame } from "models/Stryktips";
 import styled from "styled-components";
 import { SpaceProps, space } from "styled-system";
